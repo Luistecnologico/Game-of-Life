@@ -18,6 +18,9 @@ namespace GameOfLife
         static int[,] gridPrincipal;
         static int[,] gridSecundario;
         static int contador = 0;
+        static int numeroRepeticiones = 1;
+        static int numeroTotalCelulasVivas = 0;
+        static string celula = "@";
         public struct ventanaS
         {
             public int altura;
@@ -55,15 +58,48 @@ namespace GameOfLife
          */
         static void IniciarJuego()
         {
-            int x, y, celdasVivasInicio;
-            Console.WriteLine("Bienvenido al juego de la Vida");
-            Console.Write("Seleccióne cuantas casillas quiere que empiecen vivas: ");
-            celdasVivasInicio = int.Parse(Console.ReadLine());
-            Console.Clear();
-            TodosMuertos();
-            CelulasIniciales(celdasVivasInicio);
-            ImprimirCelulasVivas();
-            Juego();
+            int x, y, celdasVivasInicio, ZonaMedia, posicionCursorLeft, posicionCursorTop, opcion;
+            String Bienvenidos = "Bienvenido al juego de la Vida";
+
+            ZonaMedia = (ventana.anchura / 2) - (Bienvenidos.Length/2);
+            Console.SetCursorPosition(ZonaMedia, 5);
+            Console.WriteLine(Bienvenidos + "\n");
+            Console.Write(" Seleccióne la opción que desea: ");
+            posicionCursorLeft = Console.CursorLeft;
+            posicionCursorTop = Console.CursorTop;
+            Console.WriteLine("\n 1. Metodo Aleatorio");
+            Console.WriteLine(" 2. Metodo Manual");
+            Console.WriteLine(" 3. Salir");
+
+            Console.SetCursorPosition(posicionCursorLeft, posicionCursorTop);
+            opcion = int.Parse(Console.ReadLine());
+
+            switch (opcion)
+            {
+                case 1:
+                    Console.Clear();
+                    Console.Write("Con cuantas celulas vivas deseas iniciar: ");
+                    celdasVivasInicio = int.Parse(Console.ReadLine());
+                    numeroTotalCelulasVivas = numeroTotalCelulasVivas + celdasVivasInicio;
+                    Console.Clear();
+                    TodosMuertos();
+                    CelulasIniciales(celdasVivasInicio);
+                    ImprimirCelulasVivas();
+                    Juego();
+                    break;
+                case 2:
+                    Console.Clear();
+                    Console.WriteLine("En el metodo manual debera mover el cursor al sitio que desea poner la celula viva y pulsar Space. Pulse una tecla para continuar");
+                    Console.ReadKey();
+                    Console.Clear();
+                    MetodoManual();
+                    break;
+                case 3:
+                    Environment.Exit(0);
+                    break;
+            }
+
+            
         }
 
 
@@ -135,7 +171,7 @@ namespace GameOfLife
                     if(!EstadoCelula(i,z))
                     {
                         Console.SetCursorPosition(i, z);
-                        Console.Write("@");
+                        Console.Write(celula);
                     }
                 }
             }
@@ -156,18 +192,17 @@ namespace GameOfLife
             {
                 celulasVivasPerimetro--;
                 if(celulasVivasPerimetro == 2 || celulasVivasPerimetro == 3)
-                {
                     gridSecundario[anchura, altura] = 1;
-                }
                 else
-                {
                     gridSecundario[anchura, altura] = 0;
-                } 
             }
             else
             {
                 if(celulasVivasPerimetro == 3)
+                {
                     gridSecundario[anchura, altura] = 1;
+                    numeroTotalCelulasVivas++;
+                }   
                 else
                     gridSecundario[anchura, altura] = 0;
             }
@@ -193,6 +228,11 @@ namespace GameOfLife
             return contador;
         }
 
+        /**
+         * Metodo: BordeInferiorAnchura
+         * param name="j" 
+         * Descripción: Se comprueba si la celula viva se encuentra en la parte más baja de la anchura del grill
+         */
         static int BordeInferiorAnchura(int j)
         {
             if (j == 0)
@@ -201,6 +241,11 @@ namespace GameOfLife
                 return (j - 1);
         }
 
+        /**
+        * Metodo: BordeMaximoAnchura
+        * param name="j" 
+        * Descripción: Se comprueba si la celula viva se encuentra en la parte más alta de la anchura del grill
+        */
         static int BordeMaximoAnchura(int j)
         {
             if (j == (ventana.anchura - 1))
@@ -225,6 +270,12 @@ namespace GameOfLife
                 return (j + 1);
         }
 
+
+        /**
+         * Metodo: TodosMuertosSecundarios
+         * Descripción: Establece a 0 todo el Grill secundario
+         * 
+         */
         static void TodosMuertosSecundario()
         {
             for (int i = 0; i < ventana.anchura; i++)
@@ -236,6 +287,10 @@ namespace GameOfLife
             }
         }
 
+        /**
+         * Metodo: CopiarSecundarioEnPrimario
+         * Descripción: Copia los resultados del Grill secundario en el primario
+         */
         static void CopiarSecundarioEnPrimario()
         {
             for (int i = 0; i < ventana.anchura; i++)
@@ -247,7 +302,11 @@ namespace GameOfLife
             }
         }
 
-       static void ComprobarCelulas()
+        /**
+         * Metodo: ComprobarCelulas
+         * Descripción: Inicia la comprobación de las celulas
+         */
+        static void ComprobarCelulas()
         {
             for (int i = 0; i < ventana.anchura; i++)
             {
@@ -258,6 +317,10 @@ namespace GameOfLife
             }
         } 
 
+        /**
+         * Metodo: Juego
+         * Descripción: Bucle en el cual se desarrolla el juego.
+         */
         static void Juego()
         {
             while (true)
@@ -266,9 +329,59 @@ namespace GameOfLife
                 CopiarSecundarioEnPrimario();
                 TodosMuertosSecundario();
                 ImprimirCelulasVivas();
+                numeroRepeticiones++;
+                //EscribirLog();
                 System.Threading.Thread.Sleep(100);
             }
         }
+        /*
+        static void EscribirLog()
+        {
+            System.IO.StreamWriter writer = new System.IO.StreamWriter("");
+            writer.WriteLine("Numero repeticiones: " + numeroRepeticiones);
+            writer.WriteLine("Numero de celulas vivas: " + numeroTotalCelulasVivas);
+            writer.Close();
+        }*/
 
+        static void MetodoManual()
+        {
+            TodosMuertos();
+            ConsoleKeyInfo key = new ConsoleKeyInfo();
+            Boolean sw = true;
+            int left = 0;
+            int top = 0;
+            while (sw)
+            {
+                key = Console.ReadKey();
+
+                switch (key.Key)
+                {
+                    case ConsoleKey.Spacebar:
+                        gridPrincipal[left, top] = 1;
+                        Console.Write(celula);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        top++;
+                        Console.SetCursorPosition(left, top);    
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        left--;
+                        Console.SetCursorPosition(left, top);
+                        break;
+                    case ConsoleKey.RightArrow:
+                        left++;
+                        Console.SetCursorPosition(left, top);
+                        break;
+                    case ConsoleKey.UpArrow:
+                        top--;
+                        Console.SetCursorPosition(left, top);
+                        break;
+                    case ConsoleKey.Enter:
+                        sw = false;
+                        Juego();
+                        break;
+                }
+            }
+        }
     }
 }
