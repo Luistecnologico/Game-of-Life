@@ -17,6 +17,7 @@ namespace GameOfLife
         //Variables globales que se usaran a lo largo de todo el programa
         static int[,] gridPrincipal;
         static int[,] gridSecundario;
+        static int contador = 0;
         public struct ventanaS
         {
             public int altura;
@@ -40,10 +41,10 @@ namespace GameOfLife
          */
         static void Inicializar()
         {
-            gridPrincipal = new int[Console.WindowWidth, Console.WindowHeight];
-            gridSecundario = new int[Console.WindowWidth, Console.WindowHeight];
-            ventana.altura = Console.WindowHeight;
-            ventana.anchura = Console.WindowWidth;
+            gridPrincipal = new int[Console.WindowWidth, Console.WindowHeight]; 
+             gridSecundario = new int[Console.WindowWidth, Console.WindowHeight]; 
+            ventana.altura = Console.WindowHeight; 
+            ventana.anchura = Console.WindowWidth; 
             IniciarJuego();
         }
 
@@ -134,7 +135,7 @@ namespace GameOfLife
                     if(!EstadoCelula(i,z))
                     {
                         Console.SetCursorPosition(i, z);
-                        Console.Write("*");
+                        Console.Write("@");
                     }
                 }
             }
@@ -150,8 +151,10 @@ namespace GameOfLife
         static void MatarOResucitarCelula(int anchura, int altura)
         {
             int celulasVivasPerimetro = ComprobarCelulasPerimetro(anchura, altura);
-            if(!EstadoCelula(anchura, altura))
+            
+            if (!EstadoCelula(anchura, altura))
             {
+                celulasVivasPerimetro--;
                 if(celulasVivasPerimetro == 2 || celulasVivasPerimetro == 3)
                 {
                     gridSecundario[anchura, altura] = 1;
@@ -179,9 +182,9 @@ namespace GameOfLife
         {
             int contador = 0;
 
-            for(int i = BordeInferiorAnchura(anchura); i < BordeMaximoAnchura(anchura); i++)
+            for(int i = BordeInferiorAnchura(anchura); i <= BordeMaximoAnchura(anchura); i++)
             {
-                for(int z = BordeInferiorAltura(altura); z < BordeMaximoAltura(altura); z++)
+                for(int z = BordeInferiorAltura(altura); z <= BordeMaximoAltura(altura); z++)
                 {
                     if (!EstadoCelula(i, z))
                         contador++;
@@ -258,13 +261,14 @@ namespace GameOfLife
         static void Juego()
         {
             while (true)
-            {
+            {   
                 ComprobarCelulas();
                 CopiarSecundarioEnPrimario();
                 TodosMuertosSecundario();
                 ImprimirCelulasVivas();
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(100);
             }
         }
+
     }
 }
